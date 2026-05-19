@@ -25,7 +25,7 @@ export default {
       .max(1000)
       .allow('', null),
 
-    taskDate: Joi.date()
+    task_date: Joi.date()
       .iso()
       .required(),
 

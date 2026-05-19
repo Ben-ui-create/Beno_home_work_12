@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import HttpErrors from 'http-errors';
 
 import Tasks from '../models/tasks.js';
@@ -6,11 +5,11 @@ import Tasks from '../models/tasks.js';
 export default {
   async create(req, res, next) {
     try {
-      const {title, description, taskDate, details} = req.body;
+      const {title, description, task_date, details} = req.body;
 
-      const taskCount = await Tasks.countByDate(req.userId, taskDate);
+      const taskCount = await Tasks.countByDate(req.userId, task_date);
 
-      if (taskDate >= 3) {
+      if (taskCount >= 3) {
         throw new HttpErrors(422, {
           errors: {
             taskDate: 'Maximum 3 hat',
@@ -22,11 +21,14 @@ export default {
         userId: req.userId,
         title,
         description,
-        taskDate,
+        task_date,
         details,
       });
 
-      return res.json({task});
+      return res.json({
+        message: 'Task created successfully',
+        task,
+      });
     } catch (e) {
       next(e);
     }
@@ -60,7 +62,7 @@ export default {
 
   async getById(req, res, next) {
     try {
-      const task = await Tasks.getById(req.params.id, req.userId);
+      const task = await Tasks.findById(req.params.id, req.userId);
 
       if (!task) {
         throw new HttpErrors(404, {
@@ -96,19 +98,23 @@ export default {
 
   async deleteTask(req, res, next) {
     try {
-      const task = await Tasks.findById(req.params.id, req.userId);
+      console.log('DELETE CONTROLLER HIT');
 
-      if (!task) {
+      const deleted = await Tasks.deleteTask(
+        req.params.id,
+        req.userId
+      );
+
+      if (!deleted) {
         throw new HttpErrors(404, {
           message: 'Task not found',
         });
       }
 
-      await Tasks.deleteTask(req.params.id, req.userId);
-
       return res.json({
         message: 'Task jnjvac e',
       });
+
     } catch (e) {
       next(e);
     }

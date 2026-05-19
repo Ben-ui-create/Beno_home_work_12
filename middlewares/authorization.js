@@ -5,6 +5,7 @@ import Users from '../models/users.js'
 
 export default async (req, res, next) => {
   try {
+    console.log('AUTH HIT');
     const token = req.headers?.authorization || null;
 
     if (!token) {

@@ -28,15 +28,18 @@ function mapRow(row) {
   };
 }
 
-export async function create({userId, title, description, taskDate, details}) {
+export async function create({userId, title, description, task_date, details}) {
   try {
     const [result = null] = await DbMysql.query(
-      `insert into tasks (userId, title, description, taskDate)
+      `insert into tasks (user_id, title, description, task_date)
        values (?, ?, ?, ?);`,
-      [userId, title, description, taskDate]
+      [userId, title, description, task_date]
     );
 
-    const taskId = _.get(result, '0.insertId', null);
+    const taskId = _.get(result, 'insertId', null);
+
+    console.log(details);
+    console.log(taskId);
 
     if (details) {
       await DbMysql.query(
@@ -60,31 +63,34 @@ export async function create({userId, title, description, taskDate, details}) {
 
 export async function findById(id, userId) {
   try {
-    const [result = null] = await DbMysql.query(
+    const [rows] = await DbMysql.query(
       `
-          SELECT t.*,
-                 tD.priority AS t_priority,
-                 tD.location AS t_location,
-                 tD.notes    AS t_notes
-          FROM tasks t
-                   LEFT JOIN task_details tD
-                             ON t.id = tD.task_id
-          WHERE t.id = ?
-            AND t.user_id = ? LIMIT 1
+        SELECT
+          t.*,
+          tD.priority AS t_priority,
+          tD.location AS t_location,
+          tD.notes AS t_notes
+        FROM tasks t
+        LEFT JOIN task_details tD
+          ON t.id = tD.task_id
+        WHERE t.id = ?
+          AND t.user_id = ?
+        LIMIT 1
       `,
       [id, userId]
     );
 
-    const res = _.head(result);
+    const row = _.head(rows);
 
-    return mapRow(res);
-  } catch (e) {
-    console.error(e);
+    return mapRow(row);
+  } catch (error) {
+    console.error(error);
+
     return null;
   }
 }
 
-export async function getList(userId, page, limit) {
+export async function getList(user_id, page, limit) {
   try {
     const offset = Math.ceil((page - 1) * limit);
 
@@ -101,7 +107,7 @@ export async function getList(userId, page, limit) {
           ORDER BY t.task_date ASC LIMIT ?
           OFFSET ?
       `,
-      [userId, limit, offset]
+      [user_id, limit, offset]
     );
 
     const [countRows = null] = await DbMysql.query(
@@ -110,7 +116,7 @@ export async function getList(userId, page, limit) {
           FROM tasks t
           WHERE t.user_id = ?
       `,
-      [userId]
+      [user_id]
     );
 
     return {
@@ -125,7 +131,7 @@ export async function getList(userId, page, limit) {
   }
 }
 
-export async function getListWithDetails(userId, page, limit) {
+export async function getListWithDetails(user_id, page, limit) {
   try {
     const offset = Math.ceil((page - 1) * limit);
 
@@ -142,7 +148,7 @@ export async function getListWithDetails(userId, page, limit) {
           ORDER BY t.task_date ASC LIMIT ?
           OFFSET ?
       `,
-      [userId, limit, offset]
+      [user_id, limit, offset]
     );
 
     const [countRows = null] = await DbMysql.query(
@@ -153,7 +159,7 @@ export async function getListWithDetails(userId, page, limit) {
           ON t.id = tD.task_id
           WHERE t.user_id = ?
       `,
-      [userId]
+      [user_id]
     );
 
     return {
@@ -168,7 +174,7 @@ export async function getListWithDetails(userId, page, limit) {
   }
 }
 
-export async function countByDate(userId, taskDate) {
+export async function countByDate(user_id, task_date) {
   try {
     const [result = null] = await DbMysql.query(
       `
@@ -177,7 +183,7 @@ export async function countByDate(userId, taskDate) {
           WHERE user_id = ?
             AND task_date = ?
       `,
-      [userId, taskDate]
+      [user_id, task_date]
     );
 
     return _.get(_.head(result), 'count', 0);
@@ -187,9 +193,9 @@ export async function countByDate(userId, taskDate) {
   }
 }
 
-export async function update(id, userId, data) {
+export async function update(id, user_id, data) {
   try {
-    const tasks = await findById(id, userId);
+    const tasks = await findById(id, user_id);
 
     if (!tasks) {
       return null;
@@ -215,7 +221,7 @@ export async function update(id, userId, data) {
 
     if (!_.isEmpty(fields)) {
       values.push(id);
-      values.push(userId);
+      values.push(user_id);
 
       await DbMysql.query(
         `
@@ -275,7 +281,7 @@ export async function update(id, userId, data) {
       }
     }
 
-    return await findById(id, userId);
+    return await findById(id, user_id);
   } catch (e) {
     console.error(e);
     return null;
@@ -286,17 +292,18 @@ export async function deleteTask(id, userId) {
   try {
     await DbMysql.query(
       `
-          DELETE
-          FROM task_details
+          DELETE FROM task_details
           WHERE task_id = ?
       `,
       [id]
     );
 
-    const [result = null] = await DbMysql.query(
+    console.log('task id:', id);
+    console.log('user id:', userId);
+
+    const [result] = await DbMysql.query(
       `
-          DELETE
-          FROM tasks
+          DELETE FROM tasks
           WHERE id = ?
             AND user_id = ?
       `,
@@ -306,7 +313,7 @@ export async function deleteTask(id, userId) {
     return _.get(result, 'affectedRows', 0) > 0;
   } catch (e) {
     console.error(e);
-    return null;
+    return false;
   }
 }
 
