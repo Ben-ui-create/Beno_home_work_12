@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import path from "path";
 import morgan from 'morgan';
 import express from 'express';
 import { createServer } from 'http';
@@ -13,13 +12,9 @@ const app = express();
 
 const { PORT } = process.env;
 
-app.set('views', path.resolve('views'));
-app.set('view engine', 'ejs');
-
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.resolve('public')));
 
 app.use(routes);
 
