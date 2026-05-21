@@ -1,0 +1,42 @@
+body {
+    background: #4e34b6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 100px 0;
+}
+
+.key {
+    font-size: 20px;
+    border: 1px solid #000;
+    width: 120px;
+    height: 30px;
+    background-color: white;
+    text-align: center;
+    margin-right: 5px;
+}
+
+.value {
+    font-size: 20px;
+    border: 1px solid #000;
+    width: 170px;
+    height: 30px;
+    background-color: white;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+a {
+    width: 150px;
+    height: 20px;
+    background-color: #000;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+    color: white;
+}

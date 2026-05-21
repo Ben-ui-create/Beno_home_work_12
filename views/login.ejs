@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/stylesheets/login.css">
+    <title>Login</title>
+</head>
+<body>
+    <div class="login-form">
+        <h1>Login</h1>
+        <div class="container">
+            <div class="main">
+                <div class="content">
+                    <h2>Log In</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required>
+                            <span class="error-msg" data-error="email"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password" required>
+                            <span class="error-msg" data-error="password"></span>
+                        </div>
+
+                        <button type="submit">Login</button>
+                        <a href="/users/register">NEED ACCOUNT ?</a>
+                    </form>
+                    <p class="account">Dont Have An Account? <a href="/users/register">Register</a></p>
+                </div>
+                <div class="form-img">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>

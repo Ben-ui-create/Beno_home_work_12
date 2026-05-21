@@ -1,5 +1,10 @@
-import moment from "moment";
+// import moment from "moment";
 import HttpErrors from "http-errors";
+import jwt from "jsonwebtoken";
+
+const {
+  TOKEN_SECRET,
+} = process.env;
 
 import Users from "../models/users.js";
 
@@ -20,10 +25,16 @@ export default {
         });
       }
 
-      const token = Users.encrypt({
-        userId: user.id,
-        expiresIn: moment().add(2, 'hour').toISOString(),
-      });
+      // const token = Users.encrypt({
+      //   userId: user.id,
+      //   expiresIn: moment().add(2, 'hour').toISOString(),
+      // });
+
+      const token = jwt.sign(
+        { userId: user.id },
+        TOKEN_SECRET,
+        { expiresIn: "24h" },
+      );
 
       delete user.password;
 
